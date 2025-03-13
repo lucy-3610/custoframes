@@ -1,0 +1,7 @@
+[
+    {
+      "origin": ["https://custoframes.web.app", "http://localhost:5000"],
+      "method": ["GET", "POST", "PUT", "DELETE", "HEAD"],
+      "maxAgeSeconds": 3600
+    }
+  ]

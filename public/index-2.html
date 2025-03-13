@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CustoFrames</title>
+    <link rel="shortcut icon" href="/images/CF 3-11.png" type="image/x-icon">
+    
+    <!-- Bootstrap CSS -->
+    <!-- <link href="https://cdn.jsdelivr.com/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+     
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+  </head>
+<body>
+  <div class="d-flex justify-content-center">
+    <img class="logo my-3" src="/images/CF 3-11.png" alt="CustoFrames logo">
+  </div>
+  <div class="container custoframes-container">
+    <!-- Upload Section -->
+    <div class="section">
+      <h2 class="section-title">Upload Image</h2>
+      
+      <div class="mb-3">
+        <label for="imageInput" class="form-label">Select Image</label>
+        <input class="form-control" type="file" id="imageInput" accept="image/*">
+      </div>
+      
+      <div class="mb-3">
+        <label for="codeInput" class="form-label">Display Code</label>
+        <input type="text" class="form-control" id="codeInput" placeholder="Enter display code">
+        <div class="form-text">Create a unique code to identify your image.</div>
+      </div>
+      
+      <button id="uploadButton" class="btn btn-primary">
+        <i class="bi bi-cloud-arrow-up"></i> Upload Image
+      </button>
+    </div>
+    
+    <!-- Display Section -->
+    <div class="section">
+      <h2 class="section-title">Display Image</h2>
+      
+      <div class="row g-3">
+        <div class="col-md-8">
+          <input type="text" class="form-control" id="displayCodeInput" placeholder="Enter display code">
+        </div>
+        <div class="col-md-4">
+          <button id="displayButton" class="btn btn-outline-secondary w-100">
+            <i class="bi bi-image"></i> Display
+          </button>
+        </div>
+      </div>
+      
+      <div class="image-preview mt-3">
+        <img id="displayImage" class="img-fluid">
+        <p id="noImageText" class="text-muted mt-3 mb-0">No image to display. Enter a valid display code.</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Confirmation Modal -->
+  <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmationModalLabel">Code Already Exists</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>A display code "<span id="existingCode"></span>" already has an image associated with it.</p>
+          <p>Would you like to replace the existing image?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelButton" data-bs-dismiss="modal">Cancel Upload</button>
+          <button type="button" class="btn btn-primary" id="continueButton">Replace Existing Image</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Spinner Modal -->
+  <div class="modal fade" id="loadingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="loadingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body text-center p-4">
+          <div class="spinner-border text-primary mb-3" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <h5 id="loadingMessage">Processing your request...</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS Bundle with Popper -->
+  <!-- <script src="https://cdn.jsdelivr.com/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script> -->
+  
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js";
+    
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBweVKxbsMtFT8-W70bGTuOE5iuubxWQJ0",
+      authDomain: "custoframes.firebaseapp.com",
+      projectId: "custoframes",
+      storageBucket: "custoframes.firebasestorage.app",
+      messagingSenderId: "423904022122",
+      appId: "1:423904022122:web:f0f852ed04e92144260413",
+      measurementId: "G-0XCCB0KEL2"
+    };
+    
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+    
+    // Get references to DOM elements
+    const imageInput = document.getElementById('imageInput');
+    const codeInput = document.getElementById('codeInput');
+    const uploadButton = document.getElementById('uploadButton');
+    const displayCodeInput = document.getElementById('displayCodeInput');
+    const displayButton = document.getElementById('displayButton');
+    const displayImage = document.getElementById('displayImage');
+    const noImageText = document.getElementById('noImageText');
+    const existingCode = document.getElementById('existingCode');
+    const cancelButton = document.getElementById('cancelButton');
+    const continueButton = document.getElementById('continueButton');
+    
+    // Bootstrap modal instances
+    const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+    const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+    
+    // Initialize UI state
+    displayImage.style.display = 'none';
+    
+    // Function to show loading state
+    function showLoading(message = "Processing your request...") {
+      document.getElementById('loadingMessage').textContent = message;
+      loadingModal.show();
+    }
+    
+    // Function to hide loading state
+    function hideLoading() {
+      loadingModal.hide();
+    }
+    
+    // Function to upload image
+    async function uploadImage(code, imageFile, forceUpload = false) {
+      if (!code || !imageFile) {
+        alert('Please enter a code and select an image');
+        return;
+      }
+      
+      try {
+        // If not forcing upload, check if code exists first
+        if (!forceUpload) {
+          showLoading("Checking if code exists...");
+          const docSnap = await getDoc(doc(db, 'sessions', code));
+          
+          if (docSnap.exists()) {
+            // Show confirmation modal
+            hideLoading();
+            existingCode.textContent = code;
+            confirmationModal.show();
+            
+            // Return early, upload will be handled by modal buttons
+            return;
+          }
+        }
+        
+        showLoading("Uploading image...");
+        
+        // Create a reference to the storage location
+        const storageRef = ref(storage, 'images/' + code);
+        
+        // Upload the image
+        const snapshot = await uploadBytes(storageRef, imageFile);
+        
+        // Get the download URL
+        const url = await getDownloadURL(snapshot.ref);
+        
+        // Save the URL to Firestore
+        await setDoc(doc(db, 'sessions', code), { 
+          imageUrl: url,
+          uploadDate: new Date().toISOString(),
+          fileName: imageFile.name
+        });
+        
+        hideLoading();
+        
+        // Show success message
+        const successAlert = document.createElement('div');
+        successAlert.className = 'alert alert-success alert-dismissible fade show mt-3';
+        successAlert.innerHTML = `
+          <strong>Success!</strong> Image uploaded successfully with code: ${code}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        document.querySelector('.section').appendChild(successAlert);
+        
+        // Auto-dismiss after 5 seconds
+        setTimeout(() => {
+          const bsAlert = new bootstrap.Alert(successAlert);
+          bsAlert.close();
+        }, 5000);
+        
+        console.log('Download URL:', url);
+        
+        // Clear inputs after successful upload
+        imageInput.value = '';
+        codeInput.value = '';
+      } catch (error) {
+        hideLoading();
+        console.error('Upload error:', error);
+        
+        const errorAlert = document.createElement('div');
+        errorAlert.className = 'alert alert-danger alert-dismissible fade show mt-3';
+        errorAlert.innerHTML = `
+          <strong>Error!</strong> Failed to upload image: ${error.message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        document.querySelector('.section').appendChild(errorAlert);
+      }
+    }
+    
+    // Upload button click handler
+    uploadButton.addEventListener('click', async () => {
+      const code = codeInput.value.trim();
+      const imageFile = imageInput.files[0];
+      uploadImage(code, imageFile);
+    });
+    
+    // Continue button in modal
+    continueButton.addEventListener('click', () => {
+      const code = codeInput.value.trim();
+      const imageFile = imageInput.files[0];
+      confirmationModal.hide();
+      uploadImage(code, imageFile, true);
+    });
+    
+    // Display image from Firestore
+    displayButton.addEventListener('click', async () => {
+      const code = displayCodeInput.value.trim();
+      
+      if (!code) {
+        alert('Please enter a code');
+        return;
+      }
+      
+      showLoading("Fetching image...");
+      
+      try {
+        // Fetch the document from Firestore
+        const docSnap = await getDoc(doc(db, 'sessions', code));
+        
+        hideLoading();
+        
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          displayImage.src = data.imageUrl;
+          displayImage.style.display = 'block';
+          noImageText.style.display = 'none';
+          
+          // Show image metadata if available
+          if (data.uploadDate || data.fileName) {
+            const metadataHtml = document.createElement('div');
+            metadataHtml.className = 'text-muted mt-2 small';
+            metadataHtml.innerHTML = `
+              ${data.fileName ? `<div>File: ${data.fileName}</div>` : ''}
+              ${data.uploadDate ? `<div>Uploaded: ${new Date(data.uploadDate).toLocaleString()}</div>` : ''}
+            `;
+            
+            // Remove any existing metadata
+            const existingMetadata = document.querySelector('.image-preview .text-muted.small');
+            if (existingMetadata) {
+              existingMetadata.remove();
+            }
+            
+            document.querySelector('.image-preview').appendChild(metadataHtml);
+          }
+        } else {
+          displayImage.style.display = 'none';
+          noImageText.style.display = 'block';
+          noImageText.textContent = 'No image found for this code.';
+          
+          // Remove any existing metadata
+          const existingMetadata = document.querySelector('.image-preview .text-muted.small');
+          if (existingMetadata) {
+            existingMetadata.remove();
+          }
+        }
+      } catch (error) {
+        hideLoading();
+        console.error('Display error:', error);
+        
+        displayImage.style.display = 'none';
+        noImageText.style.display = 'block';
+        noImageText.textContent = `Error: ${error.message}`;
+      }
+    });
+    
+    // Update file input display
+    imageInput.addEventListener('change', function() {
+      if (this.files && this.files[0]) {
+        const fileName = this.files[0].name;
+        const fileSize = (this.files[0].size / 1024).toFixed(1) + ' KB';
+        
+        // Display file info
+        const fileInfoHtml = document.createElement('div');
+        fileInfoHtml.className = 'alert alert-info mt-2';
+        fileInfoHtml.innerHTML = `
+          <div class="d-flex align-items-center">
+            <div class="me-3">
+              <i class="bi bi-file-earmark-image fs-4"></i>
+            </div>
+            <div class="flex-grow-1">
+              <div class="upload-file-name">${fileName}</div>
+              <div class="text-muted small">${fileSize}</div>
+            </div>
+          </div>
+        `;
+        
+        // Remove any existing file info
+        const existingFileInfo = document.querySelector('.alert.alert-info');
+        if (existingFileInfo) {
+          existingFileInfo.remove();
+        }
+        
+        // Add after file input
+        imageInput.parentNode.appendChild(fileInfoHtml);
+      }
+    });
+  </script>
+</body>
+</html>

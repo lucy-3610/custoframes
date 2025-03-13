@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CustoFrames</title>
+    <link rel="shortcut icon" href="./assets/images/CF 3-11.png" type="image/x-icon">
+    
+    <!-- Bootstrap CSS -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <!-- Import Sass.js for client-side Sass compilation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.11.1/sass.sync.min.js"></script>
+    
+    <!-- Style placeholder where compiled Sass will be inserted -->
+    <style id="compiled-css"></style>
+    
+    <!-- Custom CSS (for any styles not managed by Sass) -->
+    <!-- <link rel="stylesheet" href="/src/index.js"> -->
+    <!-- <script src="../src/index.js"></script> -->
+  </head>
+<body class="my-3">
+  <div class="d-flex justify-content-center">
+    <img class="logo mb-3" src="/assets/images/CF 3-11.png" alt="CustoFrames logo">
+  </div>
+
+  <div class="container custoframes-container">
+    <!-- Upload Section -->
+    <div class="section">
+      <h2 class="section-title">
+        <i class="bi bi-cloud-arrow-up"></i> Upload Image
+      </h2>
+      
+      <div class="mb-3">
+        <label for="imageInput" class="form-label">Select Image</label>
+        <input class="form-control" type="file" id="imageInput" accept="image/*">
+      </div>
+      
+      <div id="fileInfoContainer"></div>
+      
+      <div class="mb-3">
+        <label for="codeInput" class="form-label">Display Code</label>
+        <input type="text" class="form-control" id="codeInput" placeholder="Enter display code">
+        <div class="form-text">Create a unique code to identify your image.</div>
+      </div>
+      
+      <button id="uploadButton" class="btn btn-primary">
+        <i class="bi bi-cloud-arrow-up"></i> Upload Image
+      </button>
+      
+      <div id="uploadStatusContainer"></div>
+    </div>
+    
+    <!-- Display Section -->
+    <div class="section">
+      <h2 class="section-title">
+        <i class="bi bi-image"></i> Display Image
+      </h2>
+      
+      <div class="row g-3">
+        <div class="col-md-8">
+          <input type="text" class="form-control" id="displayCodeInput" placeholder="Enter display code">
+        </div>
+        <div class="col-md-4">
+          <button id="displayButton" class="btn btn-outline-secondary w-100">
+            <i class="bi bi-search"></i> Display
+          </button>
+        </div>
+      </div>
+      
+      <div class="image-preview mt-3">
+        <img id="displayImage" style="display: none;">
+        <p id="noImageText" class="text-muted mt-3 mb-0">No image to display. Enter a valid display code.</p>
+        <div id="imageMetadataContainer" class="image-metadata" style="display: none;"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Confirmation Modal -->
+  <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmationModalLabel">Code Already Exists</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>A display code "<span id="existingCode"></span>" already has an image associated with it.</p>
+          <p>Would you like to replace the existing image?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelButton" data-bs-dismiss="modal">Cancel Upload</button>
+          <button type="button" class="btn btn-primary" id="continueButton">Replace Existing Image</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Spinner Modal -->
+  <div class="modal fade loading-modal" id="loadingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="loadingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body text-center">
+          <div class="spinner-border text-primary mb-3" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <h5 id="loadingMessage">Processing your request...</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS Bundle with Popper -->
+  <!-- <script src="https://cdn.jsdelivr.com/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  
+  <script>
+    // Compile Sass to CSS using Sass.js
+    // document.addEventListener('DOMContentLoaded', function() {
+    //   const sassSource = document.getElementById('sass-source').textContent;
+      
+    //   // Compile Sass
+    //   Sass.compile(sassSource, function(result) {
+    //     if (result.status === 0) {
+    //       // Success - inject compiled CSS
+    //       document.getElementById('compiled-css').textContent = result.text;
+    //     } else {
+    //       // Error in compilation
+    //       console.error('Sass compilation error:', result.message);
+    //       alert('There was an error compiling the styles. Check console for details.');
+    //     }
+    //   });
+    // });
+  </script>
+  
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js";
+    
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBweVKxbsMtFT8-W70bGTuOE5iuubxWQJ0",
+      authDomain: "custoframes.firebaseapp.com",
+      projectId: "custoframes",
+      storageBucket: "custoframes.firebasestorage.app",
+      messagingSenderId: "423904022122",
+      appId: "1:423904022122:web:f0f852ed04e92144260413",
+      measurementId: "G-0XCCB0KEL2"
+    };
+    
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+    
+    // Get references to DOM elements
+    const imageInput = document.getElementById('imageInput');
+    const codeInput = document.getElementById('codeInput');
+    const uploadButton = document.getElementById('uploadButton');
+    const displayCodeInput = document.getElementById('displayCodeInput');
+    const displayButton = document.getElementById('displayButton');
+    const displayImage = document.getElementById('displayImage');
+    const noImageText = document.getElementById('noImageText');
+    const imageMetadataContainer = document.getElementById('imageMetadataContainer');
+    const existingCode = document.getElementById('existingCode');
+    const cancelButton = document.getElementById('cancelButton');
+    const continueButton = document.getElementById('continueButton');
+    const fileInfoContainer = document.getElementById('fileInfoContainer');
+    const uploadStatusContainer = document.getElementById('uploadStatusContainer');
+    
+    // Bootstrap modal instances
+    const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+    let loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+    
+    // Function to show loading state
+    function showLoading(message = "Processing your request...") {
+  document.getElementById('loadingMessage').textContent = message;
+  
+  // Force manual cleanup of modal state
+  document.body.classList.remove('modal-open');
+  document.body.style.removeProperty('padding-right');
+  
+  const backdrops = document.querySelectorAll('.modal-backdrop');
+  backdrops.forEach(backdrop => backdrop.remove());
+  
+  const modalElement = document.getElementById('loadingModal');
+  modalElement.classList.remove('show');
+  modalElement.style.display = 'none';
+  modalElement.setAttribute('aria-hidden', 'true');
+  modalElement.removeAttribute('aria-modal');
+  
+  // Create new modal instance to ensure clean state
+  loadingModal = new bootstrap.Modal(modalElement, {
+    backdrop: 'static',
+    keyboard: false
+  });
+  
+  modalElement.style.display = 'block';
+  setTimeout(() => {
+    loadingModal.show();
+  }, 10);
+}
+    
+    // Function to hide loading state
+    function hideLoading() {
+  try {
+    const modalElement = document.getElementById('loadingModal');
+    
+    // First hide the modal using Bootstrap's API
+    if (loadingModal) {
+      loadingModal.hide();
+    }
+    
+    // Then force cleanup of modal elements
+    setTimeout(() => {
+      modalElement.classList.remove('show');
+      modalElement.style.display = 'none';
+      modalElement.setAttribute('aria-hidden', 'true');
+      modalElement.removeAttribute('aria-modal');
+      
+      document.body.classList.remove('modal-open');
+      document.body.style.removeProperty('padding-right');
+      
+      const backdrops = document.querySelectorAll('.modal-backdrop');
+      backdrops.forEach(backdrop => backdrop.remove());
+    }, 100);
+  } catch (error) {
+    console.error("Error hiding modal:", error);
+    
+    // Fallback cleanup if the normal approach fails
+    const modalElement = document.getElementById('loadingModal');
+    modalElement.style.display = 'none';
+    
+    document.body.classList.remove('modal-open');
+    document.body.style.removeProperty('padding-right');
+    
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    backdrops.forEach(backdrop => backdrop.remove());
+  }
+}
+    
+    // Function to show status messages
+    function showStatus(message, type = 'success') {
+      const statusElement = document.createElement('div');
+      statusElement.className = `alert alert-${type} alert-dismissible fade show mt-3`;
+      statusElement.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      `;
+      uploadStatusContainer.appendChild(statusElement);
+      
+      // Auto-dismiss after 5 seconds
+      setTimeout(() => {
+        const bsAlert = new bootstrap.Alert(statusElement);
+        bsAlert.close();
+      }, 5000);
+    }
+    
+    // Function to format file size
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' bytes';
+      else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+      else return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+    
+    // Function to update file info display
+    function updateFileInfo(file) {
+      fileInfoContainer.innerHTML = '';
+      
+      if (file) {
+        const fileSize = formatFileSize(file.size);
+        
+        const fileInfoElement = document.createElement('div');
+        fileInfoElement.className = 'file-info p-3 mt-3 mb-3';
+        fileInfoElement.innerHTML = `
+          <div class="d-flex align-items-center">
+            <div class="file-icon me-3">
+              <i class="bi bi-file-earmark-image"></i>
+            </div>
+            <div class="flex-grow-1">
+              <div class="file-name fw-medium">${file.name}</div>
+              <div class="text-muted small">${fileSize}</div>
+            </div>
+          </div>
+        `;
+        
+        fileInfoContainer.appendChild(fileInfoElement);
+      }
+    }
+    
+    // Function to upload image
+    async function uploadImage(code, imageFile, forceUpload = false) {
+      if (!code || !imageFile) {
+        showStatus('Please enter a code and select an image', 'danger');
+        return;
+      }
+      
+      try {
+        // If not forcing upload, check if code exists first
+        if (!forceUpload) {
+          showLoading("Checking if code exists...");
+          const docSnap = await getDoc(doc(db, 'sessions', code));
+          
+          if (docSnap.exists()) {
+            // Show confirmation modal
+            hideLoading();
+            existingCode.textContent = code;
+            confirmationModal.show();
+            
+            // Return early, upload will be handled by modal buttons
+            return;
+          }
+        }
+        
+        showLoading("Uploading image...");
+        
+        // Create a reference to the storage location
+        const storageRef = ref(storage, 'images/' + code);
+        
+        // Upload the image
+        const snapshot = await uploadBytes(storageRef, imageFile);
+        
+        // Get the download URL
+        const url = await getDownloadURL(snapshot.ref);
+        
+        // Save the URL to Firestore with metadata
+        await setDoc(doc(db, 'sessions', code), { 
+          imageUrl: url,
+          uploadDate: new Date().toISOString(),
+          fileName: imageFile.name,
+          fileSize: imageFile.size,
+          fileType: imageFile.type
+        });
+        
+        hideLoading();
+        
+        // Show success message
+        showStatus(`<strong>Success!</strong> Image uploaded successfully with code: <strong>${code}</strong>`);
+        
+        // Log success
+        console.log('Image uploaded successfully:', url);
+        
+        // Clear inputs after successful upload
+        imageInput.value = '';
+        codeInput.value = '';
+        fileInfoContainer.innerHTML = '';
+      } catch (error) {
+        hideLoading();
+        console.error('Upload error:', error);
+        
+        showStatus(`<strong>Error!</strong> Failed to upload image: ${error.message}`, 'danger');
+      }
+    }
+    
+    // Upload button click handler
+    uploadButton.addEventListener('click', async () => {
+      const code = codeInput.value.trim();
+      const imageFile = imageInput.files[0];
+      uploadImage(code, imageFile);
+    });
+    
+    // Continue button in modal
+    continueButton.addEventListener('click', () => {
+      const code = codeInput.value.trim();
+      const imageFile = imageInput.files[0];
+      confirmationModal.hide();
+      uploadImage(code, imageFile, true);
+    });
+    
+    // Display image from Firestore
+    displayButton.addEventListener('click', async () => {
+  const code = displayCodeInput.value.trim();
+  
+  if (!code) {
+    showStatus('Please enter a display code', 'danger');
+    return;
+  }
+  
+  showLoading("Fetching image...");
+  
+  try {
+    // Fetch the document from Firestore
+    const docSnap = await getDoc(doc(db, 'sessions', code));
+    
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      
+      // Set up image load completion before setting src
+      const loadImagePromise = new Promise((resolve) => {
+        displayImage.onload = resolve;
+        displayImage.onerror = resolve; // Also resolve on error to ensure we continue
+      });
+      
+      // Set image src
+      displayImage.src = data.imageUrl;
+      
+      // Wait for image to load or error
+      await loadImagePromise;
+      
+      displayImage.style.display = 'block';
+      noImageText.style.display = 'none';
+      
+      // Show image metadata if available
+      imageMetadataContainer.innerHTML = '';
+      imageMetadataContainer.style.display = 'block';
+      
+      const metadataHTML = `
+        ${data.fileName ? `<div>File: ${data.fileName}</div>` : ''}
+        ${data.fileSize ? `<div>Size: ${formatFileSize(data.fileSize)}</div>` : ''}
+        ${data.uploadDate ? `<div>Uploaded: ${new Date(data.uploadDate).toLocaleString()}</div>` : ''}
+      `;
+      
+      imageMetadataContainer.innerHTML = metadataHTML;
+    } else {
+      displayImage.style.display = 'none';
+      imageMetadataContainer.style.display = 'none';
+      noImageText.style.display = 'block';
+      noImageText.textContent = 'No image found for this code.';
+    }
+  } catch (error) {
+    console.error('Display error:', error);
+    
+    displayImage.style.display = 'none';
+    imageMetadataContainer.style.display = 'none';
+    noImageText.style.display = 'block';
+    noImageText.textContent = `Error: ${error.message}`;
+  } finally {
+    // Give browser a chance to paint the display image before hiding modal
+    setTimeout(() => {
+      hideLoading();
+    }, 300);
+  }
+});
+    
+    // Update file input display when file is selected
+    imageInput.addEventListener('change', function() {
+      if (this.files && this.files[0]) {
+        updateFileInfo(this.files[0]);
+      } else {
+        fileInfoContainer.innerHTML = '';
+      }
+    });
+    
+    // Enter key event listeners
+    codeInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter' && imageInput.files.length > 0) {
+        uploadButton.click();
+      }
+    });
+    
+    displayCodeInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        displayButton.click();
+      }
+    });
+  </script>
+</body>
+</html>

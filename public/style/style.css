@@ -1,0 +1,124 @@
+:root {
+    --primary-color: #161440;
+    --background-color: #f8f9fa;
+    --secondary-color: #509E34;
+    --accent-color: #BF9B30;
+    --border-radius: 0.375rem;
+  }
+
+img {
+    /* max-width: 100%; */
+    max-height: 100vh;
+}
+
+.logo {
+    width: 100px;
+}
+
+h2 {
+    color:red;
+}
+
+
+  
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--background-color);
+    color: var(--primary-color);
+    padding: 20px;
+  }
+  
+  .custoframes-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    padding: 2rem;
+  }
+  
+  .section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .section:last-child {
+    border-bottom: none;
+  }
+  
+  .section-title {
+    color: var(--primary-color);
+    margin-bottom: 1.25rem;
+    font-weight: 600;
+  }
+  
+  .input-group {
+    margin-bottom: 1rem;
+  }
+  
+  .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+  
+  .btn-primary:hover {
+    background-color: darken(var(--primary-color), 10%);
+    border-color: darken(var(--primary-color), 10%);
+  }
+  
+  .btn-outline-secondary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+  
+  .btn-outline-secondary:hover {
+    background-color: var(--primary-color);
+    color: white;
+  }
+  
+  .image-preview {
+    border: 1px dashed #ced4da;
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    text-align: center;
+    margin-top: 1rem;
+  }
+  
+  #displayImage {
+    max-width: 100%;
+    max-height: 400px;
+    display: block;
+    margin: 0 auto;
+  }
+  
+  .file-upload-wrapper {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+  
+  .file-upload-wrapper .form-control {
+    padding-right: 100px;
+  }
+  
+  .upload-file-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  /* Modal styles */
+  .modal-content {
+    border-radius: var(--border-radius);
+  }
+  
+  .modal-header {
+    background-color: var(--primary-color);
+    color: white;
+    border-top-left-radius: calc(var(--border-radius) - 1px);
+    border-top-right-radius: calc(var(--border-radius) - 1px);
+  }
+  
+  .modal-footer {
+    border-top: none;
+  }
